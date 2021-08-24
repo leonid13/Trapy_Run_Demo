@@ -20,7 +20,7 @@ GameObject:
   m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4
+  m_StaticEditorFlags: 8
   m_IsActive: 1
 --- !u!4 &5609447546744231662
 Transform:
@@ -145,3 +145,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d6a9b41b8d8fcf40a423df1a47a27d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gapCollider: {fileID: 7160128408004330987, guid: b990e5d4fe4ad9a4d8063b348510bc43, type: 3}

@@ -6,12 +6,15 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] Transform moveTarget;
-    [SerializeField] float minXMovement = -5f;
-    [SerializeField] float maxXMovement = 5f;
+    [SerializeField] private Transform moveTarget;
+    [SerializeField] private float minXMovement = -5f;
+    [SerializeField] private float maxXMovement = 5f;
 
     private Camera mainCamera;
     private NavMeshAgent navMeshAgent;
+    private RaycastHit hit;
+    private RaycastHit[] nearbyEnemyHits;
+    private bool callForEnemies = true;
 
     void Awake()
     {
@@ -23,11 +26,30 @@ public class Player : MonoBehaviour
     {
         ProcessInput();
         moveTarget.position = new Vector3(moveTarget.position.x, 0, transform.position.z + 6f);
-        navMeshAgent.SetDestination(moveTarget.position);
+        if (navMeshAgent.enabled) navMeshAgent.SetDestination(moveTarget.position);
 
+        if (!Physics.Raycast(transform.position, -Vector3.up, out hit))
+        {
+            navMeshAgent.enabled = false;
+        }
+
+        if (callForEnemies) CheckForEnemies();
     }
 
-    void ProcessInput()
+    private void CheckForEnemies()
+    {
+        nearbyEnemyHits = Physics.SphereCastAll(transform.position, 2f, Vector3.up, 0, LayerMask.GetMask("Enemy"));
+        int hitsLenght = nearbyEnemyHits.Length;
+        if (hitsLenght == 0) return; // someone is near, Player got jumped on
+
+        callForEnemies = false;
+        for (int i = 0; i < hitsLenght; i++)
+        {
+            StartCoroutine(nearbyEnemyHits[i].collider.GetComponent<Enemy>().JumpOnPlayer(true));
+        }
+    }
+
+    private void ProcessInput()
     {
         if (Touchscreen.current.primaryTouch.press.isPressed)
         {
@@ -51,5 +73,15 @@ public class Player : MonoBehaviour
         {
             other.GetComponent<FloorCube>().TriggerFall();
         }
+    }
+
+    // PUBLIC METHODS
+    public void Die()
+    {
+        Debug.Log("Die");
+        //menu open try again
+        //die animation
+        //stop navmehs
+        // navspeed to 0
     }
 }
