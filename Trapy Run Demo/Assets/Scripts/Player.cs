@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float turnningTolerance = 0.25f;
     [SerializeField] private float minXMovement = -5f;
     [SerializeField] private float maxXMovement = 5f;
+    [SerializeField] private NavMeshSurface dynamicNavMesh;
+    [SerializeField] private NavMeshData dynamicNavData;
 
     private Camera mainCamera;
     private NavMeshAgent navMeshAgent;
@@ -23,6 +25,11 @@ public class Player : MonoBehaviour
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         mainCamera = Camera.main;
+    }
+
+    private void Start()
+    {
+        InvokeRepeating(nameof(UpdateNavMeshData), 0.5f, 0.4f);  //1s delay, repeat every 1s
     }
 
     void Update()
@@ -38,6 +45,11 @@ public class Player : MonoBehaviour
         }
 
         if (callForEnemies) CheckForEnemies();
+    }
+
+    private void UpdateNavMeshData()
+    {
+        dynamicNavMesh.UpdateNavMesh(dynamicNavData);
     }
 
     // for some reason when Player was making a steep turn it slowed him down,
