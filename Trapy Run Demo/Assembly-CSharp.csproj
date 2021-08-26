@@ -37,8 +37,11 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Player.cs" />
-     <Compile Include="Assets\Scripts\FloorCube.cs" />
      <Compile Include="Assets\Scripts\Enemy.cs" />
+     <Compile Include="Assets\Scripts\FloorCube.cs" />
+     <Compile Include="Assets\Scripts\ActivateRagdoll.cs" />
+     <None Include="Assets\Polytope Studio\Lowpoly Medieval Characters\Sources\Shaders\PT_Medieval_Armors_Shader_PBR.shader" />
+     <None Include="Assets\Polytope Studio\Lowpoly Medieval Characters\Sources\Shaders\PT_Medieval_Armors_Shader_Toon.shader" />
     <Reference Include="UnityEngine">
         <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

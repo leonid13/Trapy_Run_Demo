@@ -5,41 +5,59 @@ using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-    public Transform moveTarget;
-    [SerializeField] float jumpStrenght;// or jump time
+    [SerializeField] Transform moveTarget;
+    // jumpTime goes in hand with the value for jumpAnimSpeed and jumps over X cubes, this is for different enemy Levels
+    //                                        3 cubes    2      1     0
+    [SerializeField] float jumpTime = 0.75f;// 0.75f | 0.50f | 0.3f | 0.07f
+    [SerializeField] float jumpAnimSpeed = 1f;// 1f  | 1.25f | 1.5f | 1f no jump
     [SerializeField] float shoutDistance = 2f;
+    [SerializeField] float maxSpeedBoost = 10f;
+    [SerializeField] float minSpeed = 5f;
+    [SerializeField] Animator animator;
 
     private RaycastHit hit;
     private bool jumping = false;
-    private Player player;
+    private Transform playerTrans;
+    private int collisions = 0;
+    private NavMeshAgent navMeshAgent;
 
     void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        navMeshAgent = GetComponent<NavMeshAgent>();
+        playerTrans = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
     }
 
     void Start()
     {
-        GetComponent<NavMeshAgent>().SetDestination(moveTarget.position);
+        navMeshAgent.SetDestination(moveTarget.position);
     }
 
-    void Update()
+    private void Update()
     {
-        if (!jumping && !Physics.Raycast(transform.position, -Vector3.up, out hit))
+        Acceleration();
+        if (collisions == 0 && jumping == false)
         {
-            // StartCoroutine(JumpOverCubes());
+            StartCoroutine(JumpOverCubes());
         }
     }
 
     protected virtual IEnumerator JumpOverCubes()// this is diffrent for level 3 enemy
     {
         jumping = true;
-        //jump animation
-        //increase Y poition based on jump strenght
-        //when Y pos is again 0, check for ground, if no ground is found disable navmeshaganet
+        animator.SetBool("Jump", true);
 
+        animator.speed = jumpAnimSpeed;
+        yield return new WaitForSeconds(jumpTime);
+
+        if (collisions == 0)
+        {
+            GetComponent<ActivateRagdoll>().ActivateRagdolll(animator);
+            navMeshAgent.enabled = false;
+        }
+
+        animator.speed = 1f;
         jumping = false;
-        yield return null;
+        animator.SetBool("Jump", false);
     }
 
     protected virtual void Movement()// this is diffrent for level 3 enemy
@@ -49,28 +67,33 @@ public class Enemy : MonoBehaviour
 
     private void Acceleration()// for when enemies are far behind
     {
+        navMeshAgent.speed = (1 - transform.position.z / playerTrans.position.z) * maxSpeedBoost + minSpeed;
+    }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        collisions++;
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        collisions--;
     }
 
     // PUBLIC METHODS               // this also means first to jump on player
     public IEnumerator JumpOnPlayer(bool shouldAgrevateOthers)
     {
-        Debug.Log("JumpOnPlayer");
         if (shouldAgrevateOthers)
         {
             AgrevateNearbyEnemies();
         }
-        // stop navMesh
-        // set speed to 0
-        // jump animation
-        // transform.translate to Player Coroutine
-        // look at Player
-
-        //only the first enemy that is near the Player, trigger his death
-        // Just when he lands on him
+        navMeshAgent.SetDestination(playerTrans.position);
+        animator.SetTrigger("JumpOnPlayer");
+        yield return new WaitForSeconds(0.4f);// wait for peak in jump animation
+        GetComponent<ActivateRagdoll>().ActivateRagdolll(animator);
         if (shouldAgrevateOthers)
         {
-            player.Die();
+            playerTrans.GetComponent<Player>().Die();
         }
         yield return null;
     }
@@ -86,20 +109,4 @@ public class Enemy : MonoBehaviour
             StartCoroutine(hits[i].collider.GetComponent<Enemy>().JumpOnPlayer(false));
         }
     }
-
-    // public void AggrevateNearbyEnemiesOnDamaged()
-    // {
-    //     RaycastHit[] hits = Physics.SphereCastAll(transform.position, shoutDistance, Vector3.up, 0, LayerMask.GetMask("Enemy"));
-    //     int hitsLenght = hits.Length;
-    //     if (hitsLenght == 0 || currentTarget == null) return;
-
-    //     for (int i = 0; i < hitsLenght; i++)
-    //     {
-    //         AIController ai = hits[i].collider.GetComponent<AIController>();
-    //         if (ai.fighter.CanAttack(currentTarget, true))
-    //         {
-    //             ai.AggrevateOnDamaged(currentTarget);
-    //         }
-    //     }
-    // }
 }
