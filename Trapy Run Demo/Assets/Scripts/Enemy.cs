@@ -7,12 +7,13 @@ public class Enemy : MonoBehaviour
 {
     [SerializeField] Transform moveTarget;
     // jumpTime goes in hand with the value for jumpAnimSpeed and jumps over X cubes, this is for different enemy Levels
-    //                                        3 cubes    2      1     0
-    [SerializeField] float jumpTime = 0.75f;// 0.75f | 0.50f | 0.3f | 0.07f
-    [SerializeField] float jumpAnimSpeed = 1f;// 1f  | 1.25f | 1.5f | 1f no jump
+    //                                             3      2       1        0
+    [SerializeField] float jumpTime = 0.75f;//   0.50f | 0.25f | 0.13f |  0.05f
+    [SerializeField] float jumpAnimSpeed = 1f;// 1.25f | 1.6f  |  2f   |  1f no jump
     [SerializeField] float shoutDistance = 2f;
     [SerializeField] float maxSpeedBoost = 10f;
     [SerializeField] float minSpeed = 5f;
+    [SerializeField] bool isSmart = false;
     [SerializeField] Animator animator;
 
     private RaycastHit hit;
@@ -34,6 +35,8 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
+        if (isSmart) navMeshAgent.SetDestination(playerTrans.position);
+
         Acceleration();
         if (collisions == 0 && jumping == false)
         {
@@ -41,8 +44,17 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    protected virtual IEnumerator JumpOverCubes()// this is diffrent for level 3 enemy
+    private IEnumerator JumpOverCubes()// this is diffrent for level 3 enemy
     {
+        // if (isSmart)
+        // {
+        //     NavMeshHit hit;
+        //     if (navMeshAgent.Raycast(new Vector3(
+        //     transform.position.x, 0, transform.position.z + 3.1f), out hit))
+        //     {
+        //         navMeshAgent.agentTypeID = 0;
+        //     }
+        // }
         jumping = true;
         animator.SetBool("Jump", true);
 
@@ -55,14 +67,10 @@ public class Enemy : MonoBehaviour
             navMeshAgent.enabled = false;
         }
 
+        // if (isSmart) { navMeshAgent.agentTypeID = -1372625422; }
         animator.speed = 1f;
         jumping = false;
         animator.SetBool("Jump", false);
-    }
-
-    protected virtual void Movement()// this is diffrent for level 3 enemy
-    {
-
     }
 
     private void Acceleration()// for when enemies are far behind

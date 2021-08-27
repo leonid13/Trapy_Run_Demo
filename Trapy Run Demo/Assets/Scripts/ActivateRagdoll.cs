@@ -26,7 +26,7 @@ public class ActivateRagdoll : MonoBehaviour
         {
             r.detectCollisions = true;
             r.isKinematic = false;
-            r.AddForce(transform.forward * 500f, ForceMode.Force);
+            r.AddForce((transform.forward + -transform.up) * 500f, ForceMode.Force);
         }
 
         foreach (var c in GetComponentsInChildren<Collider>())

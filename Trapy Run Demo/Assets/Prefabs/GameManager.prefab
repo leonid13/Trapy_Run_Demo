@@ -293,7 +293,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2241477810095511702
 RectTransform:
   m_ObjectHideFlags: 0
@@ -385,7 +385,7 @@ CanvasGroup:
   m_Enabled: 1
   m_Alpha: 1
   m_Interactable: 0
-  m_BlocksRaycasts: 1
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!114 &2241477810095511699
 MonoBehaviour:
@@ -675,6 +675,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2241477810536727015}
   - component: {fileID: 2241477810536727008}
+  - component: {fileID: 8996256477795895920}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -719,6 +720,18 @@ MonoBehaviour:
   tryAgainButton: {fileID: 2241477810120730227}
   nextLevelButton: {fileID: 2241477810798582144}
   faderScript: {fileID: 2241477810095511699}
+--- !u!114 &8996256477795895920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2241477810536727009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dfd295c17487df4b8cd1901a57d6ef8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2241477810712336506
 GameObject:
   m_ObjectHideFlags: 0
@@ -1117,7 +1130,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2241477810974732900
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1474,7 +1487,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Hold & Drag to move
+  m_text: Tap & Drag to move
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

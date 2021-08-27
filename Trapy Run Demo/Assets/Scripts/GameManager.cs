@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -15,26 +16,47 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Button tryAgainButton;
     [SerializeField] private Button nextLevelButton;
     [SerializeField] private Fader faderScript;
+
     private bool canActivateNextScene = false;
-    private bool canRealoadCurrentScene = false;
+    private List<Enemy> enemyList = new List<Enemy>();
+    private Player player;
 
     private void Awake()
     {
+        if (!PlayerPrefs.HasKey("currentLevel"))
+        {
+            PlayerPrefs.SetInt("currentLevel", 0);
+        }
+        if (!PlayerPrefs.HasKey("currentLevelTEXT"))
+        {
+            PlayerPrefs.SetInt("currentLevelTEXT", 1);
+        }
         int savedSceneIndex = PlayerPrefs.GetInt("currentLevel");
         if (SceneManager.GetActiveScene().buildIndex != savedSceneIndex)
         {
             SceneManager.LoadScene(savedSceneIndex);
         }
-        int currentLevelTextValue = PlayerPrefs.GetInt("currentLevelTEXT");
-        currentLevelText.text = $"Level: {currentLevelTextValue + 1}";
 
         faderScript.FadeOutImmediate();
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        player.enabled = false;
+        player.GetComponent<BoxCollider>().enabled = false;
+        Enemy[] enemies = FindObjectsOfType<Enemy>();
+        foreach (var e in enemies)
+        {
+            enemyList.Add(e);
+            e.enabled = false;
+        }
     }
 
     private void Start()
     {
-        faderScript.FadeIn(0.3f);
-        Time.timeScale = 0f;
+        int currentLevelTextValue = PlayerPrefs.GetInt("currentLevelTEXT");
+
+        currentLevelText.text = $"Level: {currentLevelTextValue}";
+
+        faderScript.FadeIn(0.5f);
+        //PlayerPrefs.DeleteAll();
     }
 
     private void ActivateYouWinTextAndButtons()
@@ -61,47 +83,37 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private IEnumerator RealoadThisSceneInBackground()
-    {
-        yield return null;
-        AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
-        asyncOperation.allowSceneActivation = false;
-        while (!asyncOperation.isDone)
-        {
-            if (asyncOperation.progress >= 0.9f)
-            {
-                if (canRealoadCurrentScene)
-                    asyncOperation.allowSceneActivation = true;
-            }
-            yield return null;
-        }
-    }
-
     //PUBLIC Methods
-    public void StartTheGame()// called In WholeScreenButton game object
+    public void StartTheGame()// called In DisableButtonAfterTap game object
     {
-        Time.timeScale = 1f;
+        player.enabled = true;
+        player.GetComponent<BoxCollider>().enabled = true;
+        foreach (var e in enemyList)
+        {
+            e.enabled = true;
+        }
         tutorialCanvas.gameObject.SetActive(false);
     }
 
     public void CrossFinishLine()
     {
+        player.enabled = false;
+        player.GetComponent<NavMeshAgent>().isStopped = true;
+
         int currentLevelText = PlayerPrefs.GetInt("currentLevelTEXT");
-        PlayerPrefs.SetInt("currentLevelTEXT", currentLevelText++);
+        currentLevelText++;
+        PlayerPrefs.SetInt("currentLevelTEXT", currentLevelText);
 
         int nextScene = SceneManager.GetActiveScene().buildIndex + 1;
-        if (SceneManager.GetSceneByBuildIndex(nextScene) == null)
+        if (SceneManager.sceneCountInBuildSettings - 1 == SceneManager.GetActiveScene().buildIndex)
         {
             nextScene = 0;
         }
         PlayerPrefs.SetInt("currentLevel", nextScene);
 
-        Invoke(nameof(ActivateYouWinTextAndButtons), 3.5f);
-        Debug.Log("called 000");
+        Debug.Log("scene to load    " + nextScene);
+        Invoke(nameof(ActivateYouWinTextAndButtons), 3f);
         StartCoroutine(StartNextSceneInBackground(nextScene));
-        Debug.Log("Called 111");
-        StartCoroutine(RealoadThisSceneInBackground());
-        Debug.Log("Called 222");
     }
 
     public void TryAgain()// called In TryAgainButton
@@ -109,11 +121,14 @@ public class GameManager : MonoBehaviour
         int currentLevelTextValue = PlayerPrefs.GetInt("currentLevelTEXT");
         if (currentLevelTextValue == 0) { PlayerPrefs.SetInt("currentLevelTEXT", 0); }
         else
-        { PlayerPrefs.SetInt("currentLevelTEXT", currentLevelTextValue--); }
+        {
+            currentLevelTextValue--;
+            PlayerPrefs.SetInt("currentLevelTEXT", currentLevelTextValue);
+        }
         PlayerPrefs.SetInt("currentLevel", SceneManager.GetActiveScene().buildIndex);
 
-        faderScript.FadeOut(0.2f);
-        canRealoadCurrentScene = true;
+        faderScript.FadeOut(0.4f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void ActivateNextScene()// called in NextLevelButton
@@ -126,6 +141,5 @@ public class GameManager : MonoBehaviour
     {
         tryAgainButton.gameObject.SetActive(true);
         gameOverText.SetActive(true);
-        StartCoroutine(RealoadThisSceneInBackground());
     }
 }

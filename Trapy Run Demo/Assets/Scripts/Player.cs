@@ -29,7 +29,7 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        InvokeRepeating(nameof(UpdateNavMeshData), 0.5f, 0.4f);  //1s delay, repeat every 1s
+        InvokeRepeating(nameof(UpdateNavMeshData), 0.5f, 0.25f);  //1s delay, repeat every 1s
     }
 
     void Update()
