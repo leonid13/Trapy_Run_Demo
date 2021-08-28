@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
+    [SerializeField] private GameManager gameManager;
     [SerializeField] private Transform moveTarget;
     [SerializeField] private float speed = 4.3f;
     [SerializeField] private float boostSpeedOnTUrnning = 1f;
@@ -29,13 +30,16 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        GetComponent<Rigidbody>().detectCollisions = true;
+        GetComponent<Rigidbody>().isKinematic = false;
         InvokeRepeating(nameof(UpdateNavMeshData), 0.5f, 0.25f);  //1s delay, repeat every 1s
     }
 
     void Update()
     {
-        ProcessInput();
         AccelerateOnTurnning();
+        ProcessInput();
+
         moveTarget.position = new Vector3(moveTarget.position.x, 0, transform.position.z + 6f);
         if (navMeshAgent.enabled) navMeshAgent.SetDestination(moveTarget.position);
 
@@ -68,7 +72,7 @@ public class Player : MonoBehaviour
 
     private void CheckForEnemies()
     {
-        nearbyEnemyHits = Physics.SphereCastAll(transform.position, 1f, Vector3.up, 0, LayerMask.GetMask("Enemy"));
+        nearbyEnemyHits = Physics.SphereCastAll(transform.position, 1.25f, Vector3.up, 0, LayerMask.GetMask("Enemy"));
         int hitsLenght = nearbyEnemyHits.Length;
         if (hitsLenght == 0) return; // someone is near, Player got jumped on
 
@@ -103,6 +107,7 @@ public class Player : MonoBehaviour
         if (other.CompareTag("Floor"))
         {
             other.GetComponent<FloorCube>().TriggerFall();
+            Destroy(other.gameObject, 5f);
         }
     }
 
@@ -110,9 +115,11 @@ public class Player : MonoBehaviour
     public void Die()
     {
         Debug.Log("Die");
-        //menu open try again
-        //die animation
-        //stop navmehs
-        // navspeed to 0
+        gameManager.GameOver();
+        GetComponent<ActivateRagdoll>().ActivateRagdolll(transform.GetChild(0).GetComponent<Animator>());
+        navMeshAgent.speed = 0;
+        navMeshAgent.isStopped = true;
+        Rigidbody rigidbody = GetComponent<Rigidbody>();
+        rigidbody.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezePositionX;
     }
 }

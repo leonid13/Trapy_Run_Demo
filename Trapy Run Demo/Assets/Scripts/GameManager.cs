@@ -8,6 +8,7 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private EnemyWaveSpawner enemyWaveSpawner;
     [SerializeField] private Canvas tutorialCanvas;
     [SerializeField] private TextMeshProUGUI currentLevelText;
     [SerializeField] private Canvas endGameCanvas;
@@ -21,21 +22,18 @@ public class GameManager : MonoBehaviour
     private List<Enemy> enemyList = new List<Enemy>();
     private Player player;
 
+    private const float ratioStepBetweenLevels = 0.125f;
+    [HideInInspector] public float[] enemyRatios = new float[5];
+
     private void Awake()
     {
-        if (!PlayerPrefs.HasKey("currentLevel"))
-        {
-            PlayerPrefs.SetInt("currentLevel", 0);
-        }
-        if (!PlayerPrefs.HasKey("currentLevelTEXT"))
-        {
-            PlayerPrefs.SetInt("currentLevelTEXT", 1);
-        }
+        SettupPlayerPrefs();
+        enemyRatios[4] = 1000;// just to be bigger than [3]
         int savedSceneIndex = PlayerPrefs.GetInt("currentLevel");
-        if (SceneManager.GetActiveScene().buildIndex != savedSceneIndex)
-        {
-            SceneManager.LoadScene(savedSceneIndex);
-        }
+        // if (SceneManager.GetActiveScene().buildIndex != savedSceneIndex)
+        // {
+        //     SceneManager.LoadScene(savedSceneIndex);
+        // }
 
         faderScript.FadeOutImmediate();
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
@@ -47,16 +45,33 @@ public class GameManager : MonoBehaviour
             enemyList.Add(e);
             e.enabled = false;
         }
+
+        if (enemyWaveSpawner == null) enemyWaveSpawner = FindObjectOfType<EnemyWaveSpawner>();
+        enemyWaveSpawner.enabled = false;
+    }
+
+    private void SettupPlayerPrefs()
+    {
+        if (!PlayerPrefs.HasKey("currentLevel")) { PlayerPrefs.SetInt("currentLevel", 0); }
+        if (!PlayerPrefs.HasKey("currentLevelTEXT")) { PlayerPrefs.SetInt("currentLevelTEXT", 1); }
+        if (!PlayerPrefs.HasKey("enemyRatios[0]")) { PlayerPrefs.SetFloat("enemyRatios[0]", 1); }
+        if (!PlayerPrefs.HasKey("enemyRatios[1]")) { PlayerPrefs.SetFloat("enemyRatios[1]", 0); }
+        if (!PlayerPrefs.HasKey("enemyRatios[2]")) { PlayerPrefs.SetFloat("enemyRatios[2]", 0); }
+        if (!PlayerPrefs.HasKey("enemyRatios[3]")) { PlayerPrefs.SetFloat("enemyRatios[3]", 0); }
+
+        enemyRatios[0] = PlayerPrefs.GetFloat("enemyRatios[0]");
+        enemyRatios[1] = PlayerPrefs.GetFloat("enemyRatios[1]");
+        enemyRatios[2] = PlayerPrefs.GetFloat("enemyRatios[2]");
+        enemyRatios[3] = PlayerPrefs.GetFloat("enemyRatios[3]");
     }
 
     private void Start()
     {
         int currentLevelTextValue = PlayerPrefs.GetInt("currentLevelTEXT");
-
         currentLevelText.text = $"Level: {currentLevelTextValue}";
 
         faderScript.FadeIn(0.5f);
-        //PlayerPrefs.DeleteAll();
+        PlayerPrefs.DeleteAll();
     }
 
     private void ActivateYouWinTextAndButtons()
@@ -83,9 +98,49 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void IncreaseDifficulty()
+    {
+        int maxIndex = 0;
+        for (int i = 0; i <= 3; i++)// get max value
+        {
+            if (enemyRatios[i] != 0)
+            {
+                maxIndex = i;
+                break;
+            }
+        }
+        enemyRatios[maxIndex] -= ratioStepBetweenLevels;
+
+        int chosedToIncreaseIndex = 1;
+        for (int i = maxIndex; i <= 3; i++)// get min index to increase
+        {
+            if (enemyRatios[i] <= enemyRatios[i + 1])
+            {
+                chosedToIncreaseIndex = i;
+                if (chosedToIncreaseIndex == maxIndex)
+                {
+                    continue;
+                }
+                break;
+            }
+        }
+        enemyRatios[chosedToIncreaseIndex] += ratioStepBetweenLevels;
+
+        // Debug.Log(" -------------------------");
+        // Debug.Log("enemy0   === " + enemyRatios[0]);
+        // Debug.Log("enemy1   === " + enemyRatios[1]);
+        // Debug.Log("enemy2   === " + enemyRatios[2]);
+        // Debug.Log("enemy3   === " + enemyRatios[3]);
+        PlayerPrefs.SetFloat("enemyRatios[0]", enemyRatios[0]);
+        PlayerPrefs.SetFloat("enemyRatios[1]", enemyRatios[1]);
+        PlayerPrefs.SetFloat("enemyRatios[2]", enemyRatios[2]);
+        PlayerPrefs.SetFloat("enemyRatios[3]", enemyRatios[3]);
+    }
+
     //PUBLIC Methods
     public void StartTheGame()// called In DisableButtonAfterTap game object
     {
+        enemyWaveSpawner.enabled = true;
         player.enabled = true;
         player.GetComponent<BoxCollider>().enabled = true;
         foreach (var e in enemyList)
@@ -97,8 +152,8 @@ public class GameManager : MonoBehaviour
 
     public void CrossFinishLine()
     {
+        enemyWaveSpawner.StopSpawningEnemies();
         player.enabled = false;
-        player.GetComponent<NavMeshAgent>().isStopped = true;
 
         int currentLevelText = PlayerPrefs.GetInt("currentLevelTEXT");
         currentLevelText++;
@@ -119,11 +174,14 @@ public class GameManager : MonoBehaviour
     public void TryAgain()// called In TryAgainButton
     {
         int currentLevelTextValue = PlayerPrefs.GetInt("currentLevelTEXT");
-        if (currentLevelTextValue == 0) { PlayerPrefs.SetInt("currentLevelTEXT", 0); }
+        if (currentLevelTextValue == 0) { PlayerPrefs.SetInt("currentLevelTEXT", 1); }
         else
         {
-            currentLevelTextValue--;
-            PlayerPrefs.SetInt("currentLevelTEXT", currentLevelTextValue);
+            if (currentLevelTextValue != 1)
+            {
+                currentLevelTextValue--;
+                PlayerPrefs.SetInt("currentLevelTEXT", currentLevelTextValue);
+            }
         }
         PlayerPrefs.SetInt("currentLevel", SceneManager.GetActiveScene().buildIndex);
 
@@ -133,12 +191,15 @@ public class GameManager : MonoBehaviour
 
     public void ActivateNextScene()// called in NextLevelButton
     {
+        IncreaseDifficulty();
         faderScript.FadeOut(0.2f);
         canActivateNextScene = true;
     }
 
     public void GameOver() // called in Die() in Player script
     {
+        endGameCanvas.gameObject.SetActive(true);
+        enemyWaveSpawner.StopSpawningEnemies();
         tryAgainButton.gameObject.SetActive(true);
         gameOverText.SetActive(true);
     }

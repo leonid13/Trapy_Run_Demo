@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ActivateRagdoll : MonoBehaviour
 {
+    [SerializeField] BoxCollider[] colliderToBeEnabled;
     private void Awake()
     {
         foreach (var r in GetComponentsInChildren<Rigidbody>())
@@ -16,8 +17,13 @@ public class ActivateRagdoll : MonoBehaviour
         {
             c.enabled = false;
         }
-        GetComponent<BoxCollider>().enabled = true;
+        foreach (var col in colliderToBeEnabled)
+        {
+            col.enabled = true;
+        }
     }
+
+    //START
 
     public void ActivateRagdolll(Animator animator)
     {
@@ -26,12 +32,13 @@ public class ActivateRagdoll : MonoBehaviour
         {
             r.detectCollisions = true;
             r.isKinematic = false;
-            r.AddForce((transform.forward + -transform.up) * 500f, ForceMode.Force);
+            r.AddForce((transform.forward + -transform.up) * 300f, ForceMode.Force);
         }
 
         foreach (var c in GetComponentsInChildren<Collider>())
         {
             c.enabled = true;
         }
+
     }
 }

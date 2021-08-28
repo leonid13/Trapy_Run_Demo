@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] Transform moveTarget;
+    public Transform moveTarget;
     // jumpTime goes in hand with the value for jumpAnimSpeed and jumps over X cubes, this is for different enemy Levels
     //                                             3      2       1        0
     [SerializeField] float jumpTime = 0.75f;//   0.50f | 0.25f | 0.13f |  0.05f
@@ -30,7 +30,8 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
-        navMeshAgent.SetDestination(moveTarget.position);
+        if (moveTarget == null && !isSmart) Destroy(gameObject);
+        else navMeshAgent.SetDestination(moveTarget.position);
     }
 
     private void Update()
@@ -44,17 +45,8 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private IEnumerator JumpOverCubes()// this is diffrent for level 3 enemy
+    private IEnumerator JumpOverCubes()
     {
-        // if (isSmart)
-        // {
-        //     NavMeshHit hit;
-        //     if (navMeshAgent.Raycast(new Vector3(
-        //     transform.position.x, 0, transform.position.z + 3.1f), out hit))
-        //     {
-        //         navMeshAgent.agentTypeID = 0;
-        //     }
-        // }
         jumping = true;
         animator.SetBool("Jump", true);
 
@@ -63,11 +55,11 @@ public class Enemy : MonoBehaviour
 
         if (collisions == 0)
         {
+            Destroy(gameObject, 5f);
             GetComponent<ActivateRagdoll>().ActivateRagdolll(animator);
             navMeshAgent.enabled = false;
         }
 
-        // if (isSmart) { navMeshAgent.agentTypeID = -1372625422; }
         animator.speed = 1f;
         jumping = false;
         animator.SetBool("Jump", false);
@@ -98,11 +90,14 @@ public class Enemy : MonoBehaviour
         navMeshAgent.SetDestination(playerTrans.position);
         animator.SetTrigger("JumpOnPlayer");
         yield return new WaitForSeconds(0.4f);// wait for peak in jump animation
+        Destroy(gameObject, 5f);
         GetComponent<ActivateRagdoll>().ActivateRagdolll(animator);
         if (shouldAgrevateOthers)
         {
             playerTrans.GetComponent<Player>().Die();
         }
+        navMeshAgent.speed = 0;
+        navMeshAgent.isStopped = true;
         yield return null;
     }
 
