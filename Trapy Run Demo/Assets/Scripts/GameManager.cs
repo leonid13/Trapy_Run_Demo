@@ -30,10 +30,10 @@ public class GameManager : MonoBehaviour
         SettupPlayerPrefs();
         enemyRatios[4] = 1000;// just to be bigger than [3]
         int savedSceneIndex = PlayerPrefs.GetInt("currentLevel");
-        // if (SceneManager.GetActiveScene().buildIndex != savedSceneIndex)
-        // {
-        //     SceneManager.LoadScene(savedSceneIndex);
-        // }
+        if (SceneManager.GetActiveScene().buildIndex != savedSceneIndex)
+        {
+            SceneManager.LoadScene(savedSceneIndex);
+        }
 
         faderScript.FadeOutImmediate();
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
@@ -126,11 +126,6 @@ public class GameManager : MonoBehaviour
         }
         enemyRatios[chosedToIncreaseIndex] += ratioStepBetweenLevels;
 
-        // Debug.Log(" -------------------------");
-        // Debug.Log("enemy0   === " + enemyRatios[0]);
-        // Debug.Log("enemy1   === " + enemyRatios[1]);
-        // Debug.Log("enemy2   === " + enemyRatios[2]);
-        // Debug.Log("enemy3   === " + enemyRatios[3]);
         PlayerPrefs.SetFloat("enemyRatios[0]", enemyRatios[0]);
         PlayerPrefs.SetFloat("enemyRatios[1]", enemyRatios[1]);
         PlayerPrefs.SetFloat("enemyRatios[2]", enemyRatios[2]);
@@ -185,14 +180,14 @@ public class GameManager : MonoBehaviour
         }
         PlayerPrefs.SetInt("currentLevel", SceneManager.GetActiveScene().buildIndex);
 
-        faderScript.FadeOut(0.4f);
+        faderScript.FadeOutImmediate();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void ActivateNextScene()// called in NextLevelButton
     {
         IncreaseDifficulty();
-        faderScript.FadeOut(0.2f);
+        faderScript.FadeOut(0.4f);
         canActivateNextScene = true;
     }
 
