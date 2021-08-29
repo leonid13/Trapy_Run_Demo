@@ -21,6 +21,10 @@ public class ActivateRagdoll : MonoBehaviour
         {
             col.enabled = true;
         }
+
+        Rigidbody rigidbody = GetComponent<Rigidbody>();
+        rigidbody.detectCollisions = true;
+        rigidbody.isKinematic = false;
     }
 
     //START
@@ -28,6 +32,7 @@ public class ActivateRagdoll : MonoBehaviour
     public void ActivateRagdolll(Animator animator)
     {
         animator.enabled = false;
+        Destroy(GetComponent<Rigidbody>());
         foreach (var r in GetComponentsInChildren<Rigidbody>())
         {
             r.detectCollisions = true;

@@ -31,17 +31,30 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         if (moveTarget == null && !isSmart) Destroy(gameObject);
-        else navMeshAgent.SetDestination(moveTarget.position);
+        else if (!isSmart) navMeshAgent.SetDestination(moveTarget.position);
+
+        if (isSmart) InvokeRepeating(nameof(SetDestitantion), 0, 0.2f);
     }
 
     private void Update()
     {
-        if (isSmart) navMeshAgent.SetDestination(playerTrans.position);
-
         Acceleration();
         if (collisions == 0 && jumping == false)
         {
             StartCoroutine(JumpOverCubes());
+        }
+    }
+
+    private void SetDestitantion()
+    {
+        NavMeshHit hit;
+        if (navMeshAgent.SamplePathPosition(NavMesh.AllAreas, 30.0F, out hit))
+        {
+            navMeshAgent.SetDestination(playerTrans.position);
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
 
@@ -67,7 +80,10 @@ public class Enemy : MonoBehaviour
 
     private void Acceleration()// for when enemies are far behind
     {
-        navMeshAgent.speed = (1 - transform.position.z / playerTrans.position.z) * maxSpeedBoost + minSpeed;
+        if (playerTrans.position.z > transform.position.z)
+        {
+            navMeshAgent.speed = (1 - transform.position.z / playerTrans.position.z) * maxSpeedBoost + minSpeed;
+        }
     }
 
     private void OnTriggerEnter(Collider other)

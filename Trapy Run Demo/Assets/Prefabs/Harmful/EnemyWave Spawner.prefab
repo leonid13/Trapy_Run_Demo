@@ -59,4 +59,4 @@ MonoBehaviour:
   - {fileID: 8378580813925796031, guid: 9054fc0e33a71984c89c8469dd96a143, type: 3}
   numOfWaves: 3
   timeBetweenWaves: 5
-  numOfEnemiesPerWave: 18
+  numOfEnemiesPerWave: 10

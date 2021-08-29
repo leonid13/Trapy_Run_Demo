@@ -122,8 +122,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.7, y: 1, z: 0.2659757}
-  m_Center: {x: 0, y: 0, z: -0.3329879}
+  m_Size: {x: 0.7, y: 1, z: 0.22778988}
+  m_Center: {x: 0, y: 0, z: -0.5358529}
 --- !u!195 &7861857244352987948
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -160,13 +160,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
   moveTarget: {fileID: 0}
-  speed: 4
+  speed: 4.1
   boostSpeedOnTUrnning: 0.7
   turnningTolerance: 0.8
   minXMovement: -5.2
   maxXMovement: 4.9
   dynamicNavMesh: {fileID: 0}
-  dynamicNavData: {fileID: 23800000, guid: 7d66191213aafc2498b5b7a7bdee23b1, type: 2}
+  dynamicNavData: {fileID: 0}
+  floorCubeWithRbody: {fileID: 5609447546744231657, guid: 81fc0f8dcfd66f14c994d59d706cca18, type: 3}
 --- !u!114 &7861857244352987949
 MonoBehaviour:
   m_ObjectHideFlags: 0

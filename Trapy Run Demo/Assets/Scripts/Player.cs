@@ -15,6 +15,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float maxXMovement = 5f;
     [SerializeField] private NavMeshSurface dynamicNavMesh;
     [SerializeField] private NavMeshData dynamicNavData;
+    [SerializeField] private GameObject floorCubeWithRbody;
 
     private Camera mainCamera;
     private NavMeshAgent navMeshAgent;
@@ -32,7 +33,7 @@ public class Player : MonoBehaviour
     {
         GetComponent<Rigidbody>().detectCollisions = true;
         GetComponent<Rigidbody>().isKinematic = false;
-        InvokeRepeating(nameof(UpdateNavMeshData), 0.5f, 0.25f);  //1s delay, repeat every 1s
+        InvokeRepeating(nameof(UpdateNavMeshData), 0, 0.4f);  //1s delay, repeat every 1s
     }
 
     void Update()
@@ -106,8 +107,7 @@ public class Player : MonoBehaviour
     {
         if (other.CompareTag("Floor"))
         {
-            other.GetComponent<FloorCube>().TriggerFall();
-            Destroy(other.gameObject, 5f);
+            other.GetComponent<FloorCube>().TriggerFall(floorCubeWithRbody);
         }
     }
 

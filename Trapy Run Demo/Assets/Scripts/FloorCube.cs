@@ -2,10 +2,9 @@ using UnityEngine;
 
 public class FloorCube : MonoBehaviour
 {
-    public void TriggerFall()
+    public void TriggerFall(GameObject cubeToTurnRed)
     {
-        GetComponent<Rigidbody>().useGravity = true;
-        GetComponent<Rigidbody>().isKinematic = false;
-        GetComponent<Animator>().SetTrigger("Change");
+        Destroy(Instantiate(cubeToTurnRed, transform.position, Quaternion.identity), 3f);
+        Destroy(gameObject);
     }
 }

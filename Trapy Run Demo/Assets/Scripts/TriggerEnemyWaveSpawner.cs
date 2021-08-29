@@ -17,12 +17,12 @@ public class TriggerEnemyWaveSpawner : MonoBehaviour
         if (other.CompareTag("Player") && called == false)
         {
             called = true;
-            StartCoroutine(SpawnWave());
+            StartCoroutine(SpawnWave(other.transform));
         }
     }
 
 
-    private IEnumerator SpawnWave()
+    private IEnumerator SpawnWave(Transform playerTrans)
     {
         yield return null;
         float level0enemies = Mathf.Floor(gameManager.enemyRatios[0] * numOfEnemies);
@@ -57,7 +57,8 @@ public class TriggerEnemyWaveSpawner : MonoBehaviour
             }
             else if (level3enemies >= 1)
             {
-                Instantiate(enemyPrefabs[3], spawnTrans.position, Quaternion.identity);
+                go = Instantiate(enemyPrefabs[3], spawnTrans.position, Quaternion.identity);
+                go.GetComponent<Enemy>().moveTarget = playerTrans;
                 level3enemies--;
                 yield return wait;
             }

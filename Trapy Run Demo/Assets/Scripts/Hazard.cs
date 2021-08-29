@@ -5,7 +5,6 @@ using UnityEngine.AI;
 
 public class Hazard : MonoBehaviour
 {
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
@@ -15,7 +14,8 @@ public class Hazard : MonoBehaviour
         }
         else
         {
-            other.GetComponent<ActivateRagdoll>().ActivateRagdolll(other.GetComponent<Animator>());
+            other.GetComponent<ActivateRagdoll>().ActivateRagdolll(other.
+            transform.GetChild(0).GetComponent<Animator>());
             other.GetComponent<NavMeshAgent>().enabled = false;
         }
     }

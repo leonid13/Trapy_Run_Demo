@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     private bool canActivateNextScene = false;
     private List<Enemy> enemyList = new List<Enemy>();
     private Player player;
+    private bool hasIncreaseThisSession = false;
 
     private const float ratioStepBetweenLevels = 0.125f;
     [HideInInspector] public float[] enemyRatios = new float[5];
@@ -71,7 +72,7 @@ public class GameManager : MonoBehaviour
         currentLevelText.text = $"Level: {currentLevelTextValue}";
 
         faderScript.FadeIn(0.5f);
-        PlayerPrefs.DeleteAll();
+        //PlayerPrefs.DeleteAll();
     }
 
     private void ActivateYouWinTextAndButtons()
@@ -152,6 +153,7 @@ public class GameManager : MonoBehaviour
 
         int currentLevelText = PlayerPrefs.GetInt("currentLevelTEXT");
         currentLevelText++;
+        hasIncreaseThisSession = true;
         PlayerPrefs.SetInt("currentLevelTEXT", currentLevelText);
 
         int nextScene = SceneManager.GetActiveScene().buildIndex + 1;
@@ -172,7 +174,7 @@ public class GameManager : MonoBehaviour
         if (currentLevelTextValue == 0) { PlayerPrefs.SetInt("currentLevelTEXT", 1); }
         else
         {
-            if (currentLevelTextValue != 1)
+            if (hasIncreaseThisSession)
             {
                 currentLevelTextValue--;
                 PlayerPrefs.SetInt("currentLevelTEXT", currentLevelTextValue);

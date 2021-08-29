@@ -60,7 +60,7 @@ MonoBehaviour:
   - {fileID: 8948154221136753720, guid: 458fcedc19968f4408345aa4227776a1, type: 3}
   - {fileID: 8948154221136753720, guid: 7ec79b417c9f99e4eb54f92530d7bcaf, type: 3}
   - {fileID: 8378580813925796031, guid: 9054fc0e33a71984c89c8469dd96a143, type: 3}
-  numOfEnemies: 12
+  numOfEnemies: 8
 --- !u!65 &5699785049266593968
 BoxCollider:
   m_ObjectHideFlags: 0

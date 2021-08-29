@@ -88,7 +88,8 @@ public class EnemyWaveSpawner : MonoBehaviour
             }
             else if (level3enemies >= 1)
             {
-                Instantiate(enemyPrefabs[3], pos.pos, Quaternion.identity);
+                go = Instantiate(enemyPrefabs[3], pos.pos, Quaternion.identity);
+                go.GetComponent<Enemy>().moveTarget = playerTransform;
                 level3enemies--;
                 yield return wait;
             }
